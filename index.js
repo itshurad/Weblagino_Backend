@@ -1,2 +1,8 @@
+require("dotenv").config();
 const Application = require("./app/server.js");
-new Application();
+
+// ساخت نمونه از کلاس
+const applicationInstance = new Application();
+
+// خروجی گرفتن برای ورسل
+module.exports = applicationInstance.getApp();

@@ -20,6 +20,9 @@ class Application {
     this.configRoutes();
     this.errorHandling();
   }
+  getApp() {
+    return this.#app;
+  }
   createServer() {
     this.#app.listen(this.#PORT, () =>
       console.log(`listening on port ${this.#PORT}`),
