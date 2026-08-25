@@ -23,7 +23,7 @@ class PostController extends Controller {
     const user = req.user;
     let { search, categorySlug, sort, page, limit } = req.query;
     page = Number(page) || 1;
-    limit = Number(limit) || 9;
+    limit = Number(limit) || 6;
     const skip = (page - 1) * limit;
 
     if (search) {
@@ -55,7 +55,7 @@ class PostController extends Controller {
     if (sort) {
       if (sort === "latest") sortQuery["createdAt"] = -1;
       if (sort === "earliest") sortQuery["createdAt"] = 1;
-      if (sort === "popular") sortQuery["likesCount"] = -1;
+      if (sort === "popular") sortQuery["likes"] = -1;
       if (sort === "time_desc") sortQuery["readingTime"] = -1;
       if (sort === "time_asc") sortQuery["readingTime"] = 1;
     }

@@ -27,7 +27,7 @@ const PostSchema = new mongoose.Schema(
     related: [{ type: ObjectId, ref: "Post" }],
     // a Post can have multiple comments, so it should be in a array.
     // all comments info should be kept in this array of this Post.
-    comments: [{ type: ObjectId, ref: "Comment" }],
+    // comments: [{ type: ObjectId, ref: "Comment" }],
   },
   {
     timestamps: true,

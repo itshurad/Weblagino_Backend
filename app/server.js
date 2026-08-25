@@ -22,30 +22,23 @@ class Application {
   }
   createServer() {
     this.#app.listen(this.#PORT, () =>
-      console.log(`listening on port ${this.#PORT}`)
+      console.log(`listening on port ${this.#PORT}`),
     );
   }
   connectToDB() {
     mongoose.set("strictQuery", true);
-    mongoose.connect(
-      `${this.#DB_URI}`,
-      {
+    mongoose
+      .connect(this.#DB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         authSource: "admin",
-      },
-      (err) => {
-        if (!err) {
-          console.log("MongoDB connected!!");
-        } else {
-          console.log("Failed to connect to MongoDB", err);
-        }
-      }
-    );
+      })
+      .then(() => console.log("MongoDB connected!!"))
+      .catch((err) => console.log("Failed to connect to MongoDB", err.message));
   }
   configServer() {
     this.#app.use(
-      cors({ credentials: true, origin: process.env.ALLOW_CORS_ORIGIN })
+      cors({ credentials: true, origin: process.env.ALLOW_CORS_ORIGIN }),
     );
     this.#app.use(express.json());
     this.#app.use(express.urlencoded({ extended: true }));
