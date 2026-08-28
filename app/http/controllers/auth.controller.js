@@ -162,10 +162,9 @@ class UserAuthController extends Controller {
       expires: Date.now(),
       httpOnly: true,
       signed: true,
-      sameSite: "Lax",
+      sameSite: "none",
       secure: true,
       path: "/",
-      domain: process.env.DOMAIN,
     };
     res.cookie("accessToken", null, cookieOptions);
     res.cookie("refreshToken", null, cookieOptions);
