@@ -141,8 +141,10 @@ class UserAuthController extends Controller {
     });
   }
   async refreshToken(req, res) {
-    console.log("SIGNED COOKIES:", req.signedCookies);
-    console.log("RAW COOKIES:", req.cookies);
+    console.log("========== REFRESH TOKEN ==========");
+    console.log("cookies:", req.cookies);
+    console.log("signedCookies:", req.signedCookies);
+    console.log("===================================");
 
     const userId = await VerifyRefreshToken(req);
 
