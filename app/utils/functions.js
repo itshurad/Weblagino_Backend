@@ -54,37 +54,41 @@ function generateToken(user, expiresIn, secret) {
 }
 
 async function setAccessToken(res, user) {
-  const cookieOptions = {
-    maxAge: 1000 * 60 * 60 * 24 * 1, // would expire after 1 days
-    httpOnly: true, // The cookie only accessible by the web server
-    signed: true, // Indicates if the cookie should be signed
-    sameSite: "none",
-    secure: process.env.NODE_ENV === "development" ? false : true,
-  };
-  res.cookie(
-    "accessToken",
-    await generateToken(user, "1d", process.env.ACCESS_TOKEN_SECRET_KEY),
-    cookieOptions,
+  const token = await generateToken(
+    user,
+    "1d",
+    process.env.ACCESS_TOKEN_SECRET_KEY,
   );
+
+  res.cookie("accessToken", token, {
+    maxAge: 1000 * 60 * 60 * 24,
+    httpOnly: true,
+    signed: true,
+    sameSite: "none",
+    secure: true,
+    path: "/",
+  });
 }
 
 async function setRefreshToken(res, user) {
-  const cookieOptions = {
-    maxAge: 1000 * 60 * 60 * 24 * 365, // would expire after 1 year
-    httpOnly: true, // The cookie only accessible by the web server
-    signed: true, // Indicates if the cookie should be signed
-    sameSite: "none",
-    secure: process.env.NODE_ENV === "development" ? false : true,
-  };
-  res.cookie(
-    "refreshToken",
-    await generateToken(user, "1y", process.env.REFRESH_TOKEN_SECRET_KEY),
-    cookieOptions,
+  const token = await generateToken(
+    user,
+    "1y",
+    process.env.REFRESH_TOKEN_SECRET_KEY,
   );
+
+  res.cookie("refreshToken", token, {
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+    httpOnly: true,
+    signed: true,
+    sameSite: "none",
+    secure: true,
+    path: "/",
+  });
 }
 
 function VerifyRefreshToken(req) {
-  const refreshToken = req.signedCookies["refreshToken"];
+  const refreshToken = req.signedCookies?.refreshToken;
 
   if (!refreshToken) {
     throw createError.Unauthorized("لطفا وارد حساب کاربری خود شوید.");
@@ -95,13 +99,13 @@ function VerifyRefreshToken(req) {
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET_KEY,
       async (err, payload) => {
-        try {
-          if (err) {
-            return reject(
-              createError.Unauthorized("لطفا وارد حساب کاربری خود شوید"),
-            );
-          }
+        if (err) {
+          return reject(
+            createError.Unauthorized("Refresh Token نامعتبر یا منقضی شده است."),
+          );
+        }
 
+        try {
           const { _id } = payload;
 
           const user = await UserModel.findById(_id, {

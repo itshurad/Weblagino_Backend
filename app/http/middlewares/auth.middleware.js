@@ -11,7 +11,7 @@ async function isAuthWithCookie(req, res, next) {
     }
     const token = cookieParser.signedCookie(
       userToken,
-      process.env.COOKIE_PARSER_SECRET_KEY
+      process.env.COOKIE_PARSER_SECRET_KEY,
     );
     JWT.verify(token, process.env.TOKEN_SECRET_KEY, async (err, payload) => {
       if (err) throw createHttpError.Unauthorized("توکن نامعتبر است");
@@ -31,35 +31,43 @@ async function isAuthWithCookie(req, res, next) {
 
 async function verifyAccessToken(req, res, next) {
   try {
-    const accessToken = req.signedCookies["accessToken"];
+    const accessToken = req.signedCookies?.accessToken;
+
     if (!accessToken) {
       throw createHttpError.Unauthorized("لطفا وارد حساب کاربری خود شوید.");
     }
-    const token = cookieParser.signedCookie(
-      accessToken,
-      process.env.COOKIE_PARSER_SECRET_KEY
-    );
+
     JWT.verify(
-      token,
+      accessToken,
       process.env.ACCESS_TOKEN_SECRET_KEY,
       async (err, payload) => {
         try {
-          if (err) throw createHttpError.Unauthorized("توکن نامعتبر است");
+          if (err) {
+            throw createHttpError.Unauthorized("توکن نامعتبر یا منقضی شده است");
+          }
+
           const { _id } = payload;
+
           const user = await UserModel.findById(_id, {
             password: 0,
             otp: 0,
+            resetLink: 0,
           });
-          if (!user) throw createHttpError.Unauthorized("حساب کاربری یافت نشد");
+
+          if (!user) {
+            throw createHttpError.Unauthorized("حساب کاربری یافت نشد");
+          }
+
           req.user = user;
+
           return next();
         } catch (error) {
-          next(error);
+          return next(error);
         }
-      }
+      },
     );
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }
 

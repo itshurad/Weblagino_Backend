@@ -86,7 +86,7 @@ class UserAuthController extends Controller {
       { _id: userId },
       {
         $set: { name, email },
-      }
+      },
     );
     if (!updateResult.modifiedCount === 0)
       throw createError.BadRequest("اطلاعات ویرایش نشد");
@@ -108,7 +108,7 @@ class UserAuthController extends Controller {
       { _id: userId },
       {
         $set: { avatar: avatarAddress },
-      }
+      },
     );
     if (!updateResult.modifiedCount === 0)
       throw createError.BadRequest("عکس پروفایل آپلود نشد");
@@ -141,12 +141,18 @@ class UserAuthController extends Controller {
     });
   }
   async refreshToken(req, res) {
+    console.log("SIGNED COOKIES:", req.signedCookies);
+    console.log("RAW COOKIES:", req.cookies);
+
     const userId = await VerifyRefreshToken(req);
+
     const user = await UserModel.findById(userId);
+
     await setAccessToken(res, user);
     await setRefreshToken(res, user);
+
     return res.status(HttpStatus.OK).json({
-      StatusCode: HttpStatus.OK,
+      statusCode: HttpStatus.OK,
       data: {
         user,
       },
