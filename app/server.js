@@ -22,7 +22,7 @@ class Application {
   }
   createServer() {
     this.#app.listen(this.#PORT, () =>
-      console.log(`listening on port ${this.#PORT}`)
+      console.log(`listening on port ${this.#PORT}`),
     );
   }
   connectToDB() {
@@ -40,15 +40,20 @@ class Application {
         } else {
           console.log("Failed to connect to MongoDB", err);
         }
-      }
+      },
     );
   }
   configServer() {
     this.#app.use(
-      cors({ credentials: true, origin: process.env.ALLOW_CORS_ORIGIN })
+      cors({
+        origin: "https://weblagino-nine.vercel.app",
+        credentials: true,
+      }),
     );
+
     this.#app.use(express.json());
     this.#app.use(express.urlencoded({ extended: true }));
+
     this.#app.use(express.static(path.join(__dirname, "..")));
   }
   initClientSession() {

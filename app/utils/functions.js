@@ -87,6 +87,23 @@ async function setRefreshToken(res, user) {
   });
 }
 
+async function setRefreshToken(res, user) {
+  const token = await generateToken(
+    user,
+    "1y",
+    process.env.REFRESH_TOKEN_SECRET_KEY,
+  );
+
+  res.cookie("refreshToken", token, {
+    maxAge: 1000 * 60 * 60 * 24 * 365,
+    httpOnly: true,
+    signed: true,
+    sameSite: "none",
+    secure: true,
+    path: "/",
+  });
+}
+
 function VerifyRefreshToken(req) {
   const refreshToken = req.signedCookies?.refreshToken;
 
